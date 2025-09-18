@@ -2,19 +2,19 @@ from fastapi import FastAPI, Depends
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from database import SessionLocal, engine, Base
-import Model 
+import models
 
 app = FastAPI()
 
 Base.metadata.create_all(bind=engine)
 
-# @app.get("/")
-# def read_root():
-#     return {"message": "Hello world"}
+@app.get("/")
+def read_root():
+    return {"message": "Hello world"}
 
-# @app.get("/ping")
-# def ping():
-#     return {"status": "ok"}
+@app.get("/ping")
+def ping():
+    return {"status": "ok"}
 def get_db():
  db = SessionLocal()
  try:
@@ -22,24 +22,9 @@ def get_db():
 finally:
     db.close()
 
-class UserSchema(BaseModel):
-    email: Str
-    password: Str
-
-class DoctorSchema(BaseModel):
-   fullName: Str
-    email: Str
-    password: Str
-    specialty: Str
-    workplace: Str
-    experience: Str
-    qualifications: Str
-    availability: Str
-    linkedin: Str 
-
 
 @app.post("/signup/user")
-def signup_user(user: UserSchema, db: Session = Depends(get_db)):
+def signup_user(user: schemas.UserSchema, db: Session = Depends(get_db)):
     db_user = models.User(email=user.email, password=user.password)
     db.add(db_user)
     db.commit()
@@ -48,7 +33,7 @@ def signup_user(user: UserSchema, db: Session = Depends(get_db)):
 
 
 @app.post("/signup/doctor")
-def signup_doctor(doctor: DoctorSchema, db: Session = Depends(get_db)):
+def signup_doctor(doctor: schemas.DoctorSchema, db: Session = Depends(get_db)):
     db_doctor = models.Doctor(**doctor.dict())
     db.add(db_doctor)
     db.commit()
